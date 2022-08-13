@@ -16,8 +16,16 @@ if [[ "$EUID" -eq 0 ]]; then
 
 fi
 
+# Check if the scsript is running on Termux.
+if [[ $PREFIX = *"com.termux"* ]]; then
+    sudocmd=""  # No need for sudo on Termux.
+
+else
+    sudocmd="sudo"
+fi
+
 echo "Installing zsh, wget, and git..."
-sudo apt update && sudo apt install --upgrade zsh wget git
+${sudocmd} apt update && ${sudocmd} apt install --upgrade zsh wget git
 
 echo "Installing Oh-My-ZSH..."
 ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || echo "Failed to install Oh-My-ZSH." && exit 2
