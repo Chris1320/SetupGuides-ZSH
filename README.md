@@ -17,9 +17,14 @@ This customization guide will do the following changes:
 
 ## Automatic Installation & Customization
 
-1. Download and run the install script using either of the following commands:
-    - Using *wget*: `bash <(wget -q -O - "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
-    - Using *curl*: `bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
+Download and run the install script using either of the following commands:
+
+- Using *wget*: `$ bash <(wget -q -O - "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
+- Using *curl*: `$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
+
+To disable changing the default shell and opening ZSH, run with `--install-only` flag. Example:
+
+`$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") --install-only`
 
 ## Manual Installation & Customization
 
