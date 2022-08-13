@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-name="SetupGuides/ZSH"
+name="SetupGuides Custom ZSH"
 version=(0 1 0)
 title="${name} v${version[@]:1}.${version[@]:2}.${version[@]:3}"
 omz_installation="$HOME/.oh-my-zsh"
@@ -27,17 +27,38 @@ fi
 echo "Installing zsh, wget, and git..."
 ${sudocmd} apt update && ${sudocmd} apt install --upgrade zsh wget git
 
+if [[ $? -ne 0 ]]; then
+    echo "Error installing zsh, wget, and git."
+    exit 2
+fi
+
 echo "Installing Oh-My-ZSH..."
-ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || echo "Failed to install Oh-My-ZSH." && exit 2
+ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [[ $? -ne 0 ]]; then
+    echo "Failed to install Oh-My-ZSH."
+    exit 3
+fi
 
 echo "Cloning Powerlevel10k theme..."
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${omz_installation}/custom/themes/powerlevel10k || echo "Failed to clone Powerlevel10k theme." && exit 3
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${omz_installation}/custom/themes/powerlevel10k
+if [[ $? -ne 0 ]]; then
+    echo "Failed to clone Powerlevel10k theme."exit 3
+    exit 4
+fi
 
 echo "Installing zsh-autosuggestions..."
-git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ${omz_installation}/custom/plugins/zsh-autosuggestions || echo "Failed to install zsh-autosuggestions." && exit 4
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ${omz_installation}/custom/plugins/zsh-autosuggestions
+if [[ $? -ne 0 ]]; then
+    echo "Failed to install zsh-autosuggestions."
+    exit 5
+fi
 
 echo "Installing zsh-syntax-highlighting..."
-git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${omz_installation}/custom/plugins/zsh-syntax-highlighting || echo "Failed to install zsh-syntax-highlighting." && exit 5
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${omz_installation}/custom/plugins/zsh-syntax-highlighting
+if [[$? -ne 0 ]]; then
+    echo "Failed to install zsh-syntax-highlighting."
+    exit 6
+fi
 
 echo "Editing \`.zshrc\`..."
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
@@ -47,7 +68,12 @@ echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just w
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
 
 echo "Changing default shell to zsh..."
-chsh -s $(command -v zsh) || chsh -s zsh || echo "Failed to change shell." && exit 6  # Try alternative command if chsh fails.
+chsh -s $(command -v zsh) || chsh -s zsh  # Try alternative command if chsh fails.
+if [[ $? -ne 0 ]]; then
+    echo "Failed to change shell."
+    exit 6
+fi
+
 echo
 echo "Please restart your terminal. ZSH should now be your default shell after restart."
 exit 0
