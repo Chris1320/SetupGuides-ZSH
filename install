@@ -25,7 +25,7 @@ else
 fi
 
 printf "[i] Installing zsh, wget, and git...\n\n"
-${sudocmd} apt update && ${sudocmd} apt install --upgrade zsh wget git
+${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade zsh wget git
 
 if [[ $? -ne 0 ]]; then
     echo "[E] Error installing zsh, wget, and git."
