@@ -2,7 +2,7 @@
 
 name="SetupGuides Custom ZSH"
 version=(0 1 0)
-title="${name} v${version[@]:1}.${version[@]:2}.${version[@]:3}"
+title="${name} v${version[@]:0:1}.${version[@]:1:1}.${version[@]:2:1}"
 omz_installation="$HOME/.oh-my-zsh"
 
 echo "$title"
