@@ -24,56 +24,56 @@ else
     sudocmd="sudo"
 fi
 
-echo "Installing zsh, wget, and git..."
+printf "[i] Installing zsh, wget, and git...\n\n"
 ${sudocmd} apt update && ${sudocmd} apt install --upgrade zsh wget git
 
 if [[ $? -ne 0 ]]; then
-    echo "Error installing zsh, wget, and git."
+    echo "[E] Error installing zsh, wget, and git."
     exit 2
 fi
 
-echo "Installing Oh-My-ZSH..."
+printf "[i] Installing Oh-My-ZSH...\n\n"
 ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 if [[ $? -ne 0 ]]; then
-    echo "Failed to install Oh-My-ZSH."
+    echo "[E] Failed to install Oh-My-ZSH."
     exit 3
 fi
 
-echo "Cloning Powerlevel10k theme..."
+printf "[i] Cloning Powerlevel10k theme...\n\n"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${omz_installation}/custom/themes/powerlevel10k
 if [[ $? -ne 0 ]]; then
-    echo "Failed to clone Powerlevel10k theme."exit 3
+    echo "[E] Failed to clone Powerlevel10k theme."exit 3
     exit 4
 fi
 
-echo "Installing zsh-autosuggestions..."
+printf "[i] Installing zsh-autosuggestions...\n\n"
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ${omz_installation}/custom/plugins/zsh-autosuggestions
 if [[ $? -ne 0 ]]; then
-    echo "Failed to install zsh-autosuggestions."
+    echo "[E] Failed to install zsh-autosuggestions."
     exit 5
 fi
 
-echo "Installing zsh-syntax-highlighting..."
+printf "[i] Installing zsh-syntax-highlighting...\n\n"
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${omz_installation}/custom/plugins/zsh-syntax-highlighting
 if [[$? -ne 0 ]]; then
-    echo "Failed to install zsh-syntax-highlighting."
+    echo "[E] Failed to install zsh-syntax-highlighting."
     exit 6
 fi
 
-echo "Editing \`.zshrc\`..."
+printf "[i] Editing \`.zshrc\`...\n\n"
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
 sed -i 's/^plugins=.*/plugins=(command-not-found gh git python sudo zsh-autosuggestions zsh-syntax-highlighting)/' "${HOME}/.zshrc"
 echo 'export LANG=en_US.UTF-8  # Set language environment variable.' >> "${HOME}/.zshrc"
 echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.' >> "${HOME}/.zshrc"
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
 
-echo "Changing default shell to zsh..."
+printf "[i] Changing default shell to zsh...\n\n"
 chsh -s $(command -v zsh) || chsh -s zsh  # Try alternative command if chsh fails.
 if [[ $? -ne 0 ]]; then
-    echo "Failed to change shell."
+    echo "[E] Failed to change shell."
     exit 6
 fi
 
 echo
-echo "Please restart your terminal. ZSH should now be your default shell after restart."
+echo "[i] Please restart your terminal. ZSH should now be your default shell after restart."
 exit 0
