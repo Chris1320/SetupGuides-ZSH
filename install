@@ -72,11 +72,11 @@ echo 'export LANG=en_US.UTF-8  # Set language environment variable.' >> "${HOME}
 echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.' >> "${HOME}/.zshrc"
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
 
-printf "[i] Changing default shell to zsh...\n\n"
 if [[ $1 = "--install-only" ]]; then
-    echo "[i] Skipping changing default shell because of \`--install-only\` flag."
+    printf "[i] Skipping changing default shell because of \`--install-only\` flag.\n\n"
 
 else
+    printf "[i] Changing default shell to zsh...\n\n"
     if [[ $PREFIX = *"com.termux"* ]]; then
         chsh -s zsh
         if [[ $? -ne 0 ]]; then
