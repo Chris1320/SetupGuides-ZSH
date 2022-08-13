@@ -33,7 +33,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 printf "[i] Installing Oh-My-ZSH...\n\n"
-ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 if [[ $? -ne 0 ]]; then
     echo "[E] Failed to install Oh-My-ZSH."
     exit 3
@@ -55,7 +55,7 @@ fi
 
 printf "[i] Installing zsh-syntax-highlighting...\n\n"
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${omz_installation}/custom/plugins/zsh-syntax-highlighting
-if [[$? -ne 0 ]]; then
+if [[ $? -ne 0 ]]; then
     echo "[E] Failed to install zsh-syntax-highlighting."
     exit 6
 fi

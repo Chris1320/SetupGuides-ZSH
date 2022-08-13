@@ -18,8 +18,8 @@ This customization guide will do the following changes:
 ## Automatic Installation & Customization
 
 1. Download and run the install script using either of the following commands:
-    - Using *wget*: `wget -q -O - https://raw.githubusercontent.com/SetupGuides/ZSH/main/install | bash`
-    - Using *curl*: `curl -sSf https://raw.githubusercontent.com/SetupGuides/ZSH/main/install | bash`
+    - Using *wget*: `bash <(wget -q -O - "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
+    - Using *curl*: `bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
 
 ## Manual Installation & Customization
 
