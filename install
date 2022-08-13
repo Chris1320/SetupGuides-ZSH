@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 name="SetupGuides Custom ZSH"
-version=(0 1 1)
+version=(0 1 2)
 title="${name} v${version[@]:0:1}.${version[@]:1:1}.${version[@]:2:1}"
 omz_installation="$HOME/.oh-my-zsh"
 
@@ -68,7 +68,13 @@ echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just w
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
 
 printf "[i] Changing default shell to zsh...\n\n"
-chsh -s $(command -v zsh) || chsh -s zsh  # Try alternative command if chsh fails.
+if [[ $PREFIX = *"com.termux"* ]]; then
+    chsh -s zsh
+
+else
+    chsh -s $(command -v zsh)
+fi
+
 if [[ $? -ne 0 ]]; then
     echo "[E] Failed to change shell."
     exit 6
