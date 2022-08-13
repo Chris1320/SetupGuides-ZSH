@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+# This installation script will install ZSH and customize it.
+# You can find this on https://github.com/SetupGuides/ZSH.
+#
+# To disable changing the default shell and opening ZSH, run with `--install-only` flag.
+
 name="SetupGuides Custom ZSH"
-version=(0 1 3)
+version=(0 2 0)
 title="${name} v${version[@]:0:1}.${version[@]:1:1}.${version[@]:2:1}"
 omz_installation="$HOME/.oh-my-zsh"
 
@@ -68,21 +73,31 @@ echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just w
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
 
 printf "[i] Changing default shell to zsh...\n\n"
-if [[ $PREFIX = *"com.termux"* ]]; then
-    chsh -s zsh
-    if [[ $? -ne 0 ]]; then
-        echo "[E] Failed to change default shell."
-        exit 6
-    fi
+if [[ $1 = "--install-only" ]]; then
+    echo "[i] Skipping changing default shell because of \`--install-only\` flag."
 
 else
-    chsh -s $(command -v zsh)
-    if [[ $? -ne 0 ]]; then
-        echo "[E] Failed to change default shell."
-        exit 7
+    if [[ $PREFIX = *"com.termux"* ]]; then
+        chsh -s zsh
+        if [[ $? -ne 0 ]]; then
+            echo "[E] Failed to change default shell."
+            exit 6
+        fi
+
+    else
+        chsh -s $(command -v zsh)
+        if [[ $? -ne 0 ]]; then
+            echo "[E] Failed to change default shell."
+            exit 7
+        fi
     fi
 fi
 
 echo
-echo "[i] Please restart your terminal. ZSH should now be your default shell after restart."
-exit 0
+if [[ $1 = "--install-only" ]]; then
+    echo "[i] ${name} has been installed successfully."
+    echo "    Run \`$(command -v zsh)\` to try it out."
+    exit 0
+
+else
+    exit $(zsh)
