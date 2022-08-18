@@ -21,7 +21,7 @@ if [[ "$EUID" -eq 0 ]]; then
 
 fi
 
-# Check if the scsript is running on Termux.
+# Check if the script is running on Termux.
 if [[ $PREFIX = *"com.termux"* ]]; then
     sudocmd=""  # No need for sudo on Termux.
 
@@ -85,7 +85,7 @@ else
         fi
 
     else
-        chsh -s $(command -v zsh)
+        chsh -s $(command -v zsh)  # Change shell to ZSH.
         if [[ $? -ne 0 ]]; then
             echo "[E] Failed to change default shell."
             exit 7
@@ -100,6 +100,6 @@ if [[ $1 = "--install-only" ]]; then
     exit 0
 
 else
-    exec zsh -l
+    exec zsh -l  # Run ZSH.
 
 fi
