@@ -15,7 +15,15 @@ This customization guide will do the following changes:
 - Install [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions), a plugin that will auto suggest commands based on your zsh history.
 - Install [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), a plugin that will provide syntax highlighting in your zsh shell.
 
-## Automatic Installation & Customization
+## Installation
+
+The installation script has been tested on the following platforms:
+
+- Kali Linux WSL
+- Linux Mint 21
+- Termux Android Terminal Emulator
+
+### Automatic Installation & Customization
 
 Download and run the install script using either of the following commands:
 
@@ -26,7 +34,7 @@ To disable changing the default shell and opening ZSH, run with `--install-only`
 
 `$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") --install-only`
 
-## Manual Installation & Customization
+### Manual Installation & Customization
 
 > [***NOTE***] This guide assumes that you are using `apt` as your package manager.
 

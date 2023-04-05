@@ -6,9 +6,17 @@
 # To disable changing the default shell and opening ZSH, run with `--install-only` flag.
 
 name="SetupGuides Custom ZSH"
-version=(0 2 2)
-title="${name} v${version[@]:0:1}.${version[@]:1:1}.${version[@]:2:1}"
+version=(0 3 0)
+title="${name} v${version[*]:0:1}.${version[*]:1:1}.${version[*]:2:1}"
 omz_installation="$HOME/.oh-my-zsh"
+
+# Detect if the user uses pacman instead of apt.
+if [[ -f "/usr/bin/pacman" ]]; then
+    echo "[i] Using \`pacman\` instead of \`apt\`."
+    pacman=true
+else
+    pacman=false
+fi
 
 echo "$title"
 echo
@@ -18,19 +26,21 @@ if [[ "$EUID" -eq 0 ]]; then
     echo "This script must not be run as root."
     echo "Run with \`./install\` instead."
     exit 1
-
 fi
 
 # Check if the script is running on Termux.
 if [[ $PREFIX = *"com.termux"* ]]; then
     sudocmd=""  # No need for sudo on Termux.
-
 else
     sudocmd="sudo"
 fi
 
 printf "[i] Installing zsh, wget, and git...\n\n"
-${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade zsh wget git
+if [[ $pacman = true ]]; then
+    ${sudocmd} pacman -Syu --noconfirm zsh wget git
+else
+    ${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade zsh wget git
+fi
 
 if [[ $? -ne 0 ]]; then
     echo "[E] Error installing zsh, wget, and git."
