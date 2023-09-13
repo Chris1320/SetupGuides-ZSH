@@ -6,7 +6,7 @@
 # To disable changing the default shell and opening ZSH, run with `--install-only` flag.
 
 name="SetupGuides Custom ZSH"
-version=(0 4 0)
+version=(0 5 0)
 title="${name} v${version[*]:0:1}.${version[*]:1:1}.${version[*]:2:1}"
 omz_installation="$HOME/.oh-my-zsh"
 
@@ -86,7 +86,7 @@ fi
 
 printf "[i] Editing \`.zshrc\`...\n\n"
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
-sed -i 's/^plugins=.*/plugins=(command-not-found gh git python sudo zsh-autosuggestions zsh-syntax-highlighting)/' "${HOME}/.zshrc"
+sed -i 's/^plugins=.*/plugins=(command-not-found python sudo zsh-autosuggestions zsh-interactive-cd zsh-navigation-tools zsh-syntax-highlighting)/' "${HOME}/.zshrc"
 echo 'export LANG=en_US.UTF-8  # Set language environment variable.' >> "${HOME}/.zshrc"
 echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.' >> "${HOME}/.zshrc"
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
