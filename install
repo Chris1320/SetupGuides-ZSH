@@ -6,7 +6,7 @@
 # To disable changing the default shell and opening ZSH, run with `--install-only` flag.
 
 name="SetupGuides Custom ZSH"
-version=(0 5 0)
+version=(0 5 1)
 title="${name} v${version[*]:0:1}.${version[*]:1:1}.${version[*]:2:1}"
 omz_installation="$HOME/.oh-my-zsh"
 
@@ -39,10 +39,10 @@ if [[ $PREFIX = *"com.termux"* ]]; then sudocmd=""  # No need for sudo on Termux
 else sudocmd="sudo"
 fi
 
-printf "[i] Installing zsh, wget, and git...\n\n"
-pkgs_to_install="zsh wget git"
+printf "[i] Installing needed packages...\n\n"
+pkgs_to_install="fzf git wget zsh"
 if [[ $package_manager = "pacman" ]]; then ${sudocmd} pacman -Syu --noconfirm ${pkgs_to_install}
-elif [[ $package_manager = "dnf" ]]; then ${sudocmd} dnf install -y ${pkgs_to_install} util-linux-user  # util-linux-user provides chsh
+elif [[ $package_manager = "dnf" ]]; then ${sudocmd} dnf install -y ${pkgs_to_install} util-linux-user  # chsh is not installed by default in Fedora and util-linux-user provides it.
 elif [[ $package_manager = "apt" ]]; then ${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade ${pkgs_to_install}
 else
     echo "[E] Unable to automatically detect your package manager."
@@ -52,7 +52,7 @@ else
 fi
 
 if [[ $? -ne 0 ]]; then
-    echo "[E] Error installing zsh, wget, and git."
+    echo "[E] Error installing dependencies."
     exit 2
 fi
 
