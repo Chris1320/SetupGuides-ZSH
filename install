@@ -6,9 +6,34 @@
 # To disable changing the default shell and opening ZSH, run with `--install-only` flag.
 
 name="SetupGuides Custom ZSH"
-version=(0 5 1)
-title="${name} v${version[*]:0:1}.${version[*]:1:1}.${version[*]:2:1}"
+version=(0 5 2)
+title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 omz_installation="$HOME/.oh-my-zsh"
+omz_enabled_plugins=(
+    "command-not-found"
+    "fd"
+    "fzf"
+    "python"
+    "qrcode"
+    "ripgrep"
+    "sudo"
+    "tmux"
+    "wd"
+    "zsh-autosuggestions"
+    "zsh-interactive-cd"
+    "zsh-navigation-tools"
+    "zsh-syntax-highlighting"
+)
+pkgs_to_install=(
+    "curl"
+    "fd-find"
+    "fzf"
+    "git"
+    "ripgrep"
+    "tmux"
+    "wget"
+    "zsh"
+)
 
 # Detect the user's package manager.
 if [[ -f "$(command -v pacman)" ]]; then package_manager="pacman"
@@ -21,8 +46,7 @@ else
     exit 127
 fi
 
-echo "[i] Detected package manager: ${package_manager}"
-
+echo -e "[i] Detected package manager: ${package_manager}"
 echo "$title"
 echo
 
@@ -35,15 +59,15 @@ fi
 
 # Check if the script is running on Termux.
 # $PREFIX is an envvar in Termux that contains the system filepath.
-if [[ $PREFIX = *"com.termux"* ]]; then sudocmd=""  # No need for sudo on Termux since we don't need root to install pkgs.
+# There is no need for sudo on Termux since we don't need root to install pkgs.
+if [[ $PREFIX = *"com.termux"* ]]; then sudocmd=""
 else sudocmd="sudo"
 fi
 
 printf "[i] Installing needed packages...\n\n"
-pkgs_to_install="fzf git wget zsh"
-if [[ $package_manager = "pacman" ]]; then ${sudocmd} pacman -Syu --noconfirm ${pkgs_to_install}
-elif [[ $package_manager = "dnf" ]]; then ${sudocmd} dnf install -y ${pkgs_to_install} util-linux-user  # chsh is not installed by default in Fedora and util-linux-user provides it.
-elif [[ $package_manager = "apt" ]]; then ${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade ${pkgs_to_install}
+if [[ "$package_manager" = "pacman" ]]; then ${sudocmd} pacman -Syu --noconfirm ${pkgs_to_install[@]}
+elif [[ "$package_manager" = "dnf" ]]; then ${sudocmd} dnf install -y ${pkgs_to_install[@]} util-linux-user  # chsh is not installed by default in Fedora and util-linux-user provides it.
+elif [[ "$package_manager" = "apt" ]]; then ${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade ${pkgs_to_install[@]}
 else
     echo "[E] Unable to automatically detect your package manager."
     echo "[E] Please consider manually installing the customization instead."
@@ -85,8 +109,15 @@ if [[ $? -ne 0 ]]; then
 fi
 
 printf "[i] Editing \`.zshrc\`...\n\n"
+omz_enabled_plugins_str=""
+for plugin in "${omz_enabled_plugins[@]}"; do omz_enabled_plugins_str="${omz_enabled_plugins_str}\"${plugin}\" "
+done
+
+# Remove trailing space
+omz_enabled_plugins_str="${omz_enabled_plugins_str%" "}"
+
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
-sed -i 's/^plugins=.*/plugins=(command-not-found python sudo zsh-autosuggestions zsh-interactive-cd zsh-navigation-tools zsh-syntax-highlighting)/' "${HOME}/.zshrc"
+sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins_str})/" "${HOME}/.zshrc"
 echo 'export LANG=en_US.UTF-8  # Set language environment variable.' >> "${HOME}/.zshrc"
 echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.' >> "${HOME}/.zshrc"
 echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
