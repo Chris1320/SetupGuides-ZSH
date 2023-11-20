@@ -95,39 +95,39 @@ else
     exit 255
 fi
 
-if [[ $($pkg_install_cmd) -ne 0 ]]; then
+if ! sh -c "$pkg_install_cmd"; then
     echo "[E] Error installing dependencies."
     exit 2
 fi
 
 printf "[i] Installing Oh-My-ZSH...\n\n"
-if [[ $(ZSH="$ohmyzsh_install_dir" sh -c "$(wget -q -O - "$ohmyzsh_install_script")" "" --unattended) -ne 0 ]]; then
+if ! ZSH="$ohmyzsh_install_dir" sh -c "$(curl -L "$ohmyzsh_install_script")" "" --unattended; then
     echo "[E] Failed to install Oh-My-ZSH."
     exit 3
 fi
 
 printf "[i] Cloning Powerlevel10k theme...\n\n"
-if [[ $(git clone --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir") -ne 0 ]]; then
-    echo "[E] Failed to clone Powerlevel10k theme."exit 3
+if ! git clone --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir"; then
+    echo "[E] Failed to clone Powerlevel10k theme."
     exit 4
 fi
 
 printf "[i] Installing zsh-autosuggestions...\n\n"
-if [[ $(git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}") -ne 0 ]]; then
+if ! git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}"; then
     echo "[E] Failed to install zsh-autosuggestions."
     exit 5
 fi
 
 printf "[i] Installing zsh-syntax-highlighting...\n\n"
-if [[ $(git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir") -ne 0 ]]; then
+if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir"; then
     echo "[E] Failed to install zsh-syntax-highlighting."
     exit 6
 fi
 
-if [[ -f "${HOME}/.zshrc" ]]; then
-    echo "[i] Backing up \`.zshrc\` to \`.zshrc.bak\`..."
-    mv "${HOME}/.zshrc" "${HOME}/.zshrc.bak"
-fi
+# if [[ -f "${HOME}/.zshrc" ]]; then
+#     echo "[i] Backing up \`.zshrc\` to \`.zshrc.bak\`..."
+#     mv "${HOME}/.zshrc" "${HOME}/.zshrc.bak"
+# fi
 
 printf "[i] Editing \`.zshrc\`...\n\n"
 # Enable plugins and set theme.
@@ -159,13 +159,13 @@ if [[ $1 = "--install-only" ]]; then
 else
     printf "[i] Changing default shell to zsh...\n\n"
     if [[ $PREFIX = *"com.termux"* ]]; then
-        if [[ $(chsh -s zsh) -ne 0 ]]; then
+        if ! chsh -s zsh; then
             echo "[E] Failed to change default shell."
             exit 6
         fi
 
     else
-        if [[ $(chsh -s "$(command -v zsh)") -ne 0 ]]; then
+        if ! chsh -s "$(command -v zsh)"; then
             echo "[E] Failed to change default shell."
             exit 7
         fi
