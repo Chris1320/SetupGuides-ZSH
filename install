@@ -5,10 +5,21 @@
 #
 # To disable changing the default shell and opening ZSH, run with `--install-only` flag.
 
-name="SetupGuides Custom ZSH"
-version=(0 5 2)
+name="SetupGuides ZSH"
+version=(0 5 3)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
-omz_installation="$HOME/.oh-my-zsh"
+
+ohmyzsh_install_script="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+
+powerlevel10k_git_src="https://github.com/romkatv/powerlevel10k.git"
+zsh_autosuggestions_git_src="https://github.com/zsh-users/zsh-autosuggestions.git"
+zsh_syntax_highlighting_git_src="https://github.com/zsh-users/zsh-syntax-highlighting.git"
+
+ohmyzsh_install_dir="$HOME/.oh-my-zsh"
+powerlevel10k_install_dir="${ohmyzsh_install_dir}/custom/themes/powerlevel10k"
+zsh_autosuggestions_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-autosuggestions"
+zsh_syntax_highlighting_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-syntax-highlighting"
+
 omz_enabled_plugins=(
     "command-not-found"
     "fd"
@@ -36,9 +47,12 @@ pkgs_to_install=(
 )
 
 # Detect the user's package manager.
-if [[ -f "$(command -v pacman)" ]]; then package_manager="pacman"
-elif [[ -f "$(command -v dnf)" ]]; then package_manager="dnf"
-elif [[ -f "$(command -v apt)" ]]; then package_manager="apt"
+if [[ -f "$(command -v pacman)" ]]; then
+    package_manager="pacman"
+elif [[ -f "$(command -v dnf)" ]]; then
+    package_manager="dnf"
+elif [[ -f "$(command -v apt)" ]]; then
+    package_manager="apt"
 else
     echo "[E] Unable to automatically detect your package manager."
     echo "[E] Please consider manually installing the customization instead."
@@ -60,67 +74,66 @@ fi
 # Check if the script is running on Termux.
 # $PREFIX is an envvar in Termux that contains the system filepath.
 # There is no need for sudo on Termux since we don't need root to install pkgs.
-if [[ $PREFIX = *"com.termux"* ]]; then sudocmd=""
-else sudocmd="sudo"
+if [[ $PREFIX = *"com.termux"* ]]; then
+    sudocmd=""
+else
+    sudocmd="sudo"
 fi
 
 printf "[i] Installing needed packages...\n\n"
-if [[ "$package_manager" = "pacman" ]]; then ${sudocmd} pacman -Syu --noconfirm ${pkgs_to_install[@]}
-elif [[ "$package_manager" = "dnf" ]]; then ${sudocmd} dnf install -y ${pkgs_to_install[@]} util-linux-user  # chsh is not installed by default in Fedora and util-linux-user provides it.
-elif [[ "$package_manager" = "apt" ]]; then ${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade ${pkgs_to_install[@]}
+if [[ "$package_manager" = "pacman" ]]; then
+    pkg_install_cmd="${sudocmd} pacman -Syu --noconfirm ${pkgs_to_install[*]}"
+elif [[ "$package_manager" = "dnf" ]]; then
+    # NOTE: chsh is not installed by default in Fedora and util-linux-user provides it.
+    pkg_install_cmd="${sudocmd} dnf install -y ${pkgs_to_install[*]} util-linux-user"
+elif [[ "$package_manager" = "apt" ]]; then
+    pkg_install_cmd="${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade ${pkgs_to_install[*]}"
 else
     echo "[E] Unable to automatically detect your package manager."
-    echo "[E] Please consider manually installing the customization instead."
-    echo "[E] Exiting..."
-    exit 256
+    echo "    Please consider manually installing the customization instead."
+    echo "    Exiting..."
+    exit 255
 fi
 
-if [[ $? -ne 0 ]]; then
+if [[ $($pkg_install_cmd) -ne 0 ]]; then
     echo "[E] Error installing dependencies."
     exit 2
 fi
 
 printf "[i] Installing Oh-My-ZSH...\n\n"
-ZSH="$omz_installation" sh -c "$(wget -q -O - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-if [[ $? -ne 0 ]]; then
+if [[ $(ZSH="$ohmyzsh_install_dir" sh -c "$(wget -q -O - "$ohmyzsh_install_script")" "" --unattended) -ne 0 ]]; then
     echo "[E] Failed to install Oh-My-ZSH."
     exit 3
 fi
 
 printf "[i] Cloning Powerlevel10k theme...\n\n"
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${omz_installation}/custom/themes/powerlevel10k
-if [[ $? -ne 0 ]]; then
+if [[ $(git clone --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir") -ne 0 ]]; then
     echo "[E] Failed to clone Powerlevel10k theme."exit 3
     exit 4
 fi
 
 printf "[i] Installing zsh-autosuggestions...\n\n"
-git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ${omz_installation}/custom/plugins/zsh-autosuggestions
-if [[ $? -ne 0 ]]; then
+if [[ $(git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}") -ne 0 ]]; then
     echo "[E] Failed to install zsh-autosuggestions."
     exit 5
 fi
 
 printf "[i] Installing zsh-syntax-highlighting...\n\n"
-git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${omz_installation}/custom/plugins/zsh-syntax-highlighting
-if [[ $? -ne 0 ]]; then
+if [[ $(git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir") -ne 0 ]]; then
     echo "[E] Failed to install zsh-syntax-highlighting."
     exit 6
 fi
 
 printf "[i] Editing \`.zshrc\`...\n\n"
-omz_enabled_plugins_str=""
-for plugin in "${omz_enabled_plugins[@]}"; do omz_enabled_plugins_str="${omz_enabled_plugins_str}\"${plugin}\" "
-done
-
-# Remove trailing space
-omz_enabled_plugins_str="${omz_enabled_plugins_str%" "}"
-
+# Enable plugins and set theme.
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
-sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins_str})/" "${HOME}/.zshrc"
-echo 'export LANG=en_US.UTF-8  # Set language environment variable.' >> "${HOME}/.zshrc"
-echo 'export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.' >> "${HOME}/.zshrc"
-echo 'export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.' >> "${HOME}/.zshrc"
+sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
+# shellcheck disable=SC2016
+{
+    printf 'export LANG=en_US.UTF-8                         # Set language environment variable.\n'
+    printf 'export LESS="--no-init --quit-if-one-screen -R" # Causes `less` to just write to stdout if the text can be viewed without scrolling.\n'
+    printf 'export GPG_TTY=$TTY                             # Fix GPG "gpg failed to sign data" error.\n'
+} >>"${HOME}/.zshrc"
 
 if [[ $1 = "--install-only" ]]; then
     printf "[i] Skipping changing default shell because of \`--install-only\` flag.\n\n"
@@ -128,15 +141,13 @@ if [[ $1 = "--install-only" ]]; then
 else
     printf "[i] Changing default shell to zsh...\n\n"
     if [[ $PREFIX = *"com.termux"* ]]; then
-        chsh -s zsh
-        if [[ $? -ne 0 ]]; then
+        if [[ $(chsh -s zsh) -ne 0 ]]; then
             echo "[E] Failed to change default shell."
             exit 6
         fi
 
     else
-        chsh -s $(command -v zsh)  # Change shell to ZSH.
-        if [[ $? -ne 0 ]]; then
+        if [[ $(chsh -s "$(command -v zsh)") -ne 0 ]]; then
             echo "[E] Failed to change default shell."
             exit 7
         fi
@@ -150,6 +161,6 @@ if [[ $1 = "--install-only" ]]; then
     exit 0
 
 else
-    exec zsh -l  # Run ZSH.
+    exec zsh -l && exit 0 # Run ZSH.
 
 fi
