@@ -124,11 +124,6 @@ if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlig
     exit 6
 fi
 
-# if [[ -f "${HOME}/.zshrc" ]]; then
-#     echo "[i] Backing up \`.zshrc\` to \`.zshrc.bak\`..."
-#     mv "${HOME}/.zshrc" "${HOME}/.zshrc.bak"
-# fi
-
 printf "[i] Editing \`.zshrc\`...\n\n"
 # Enable plugins and set theme.
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
