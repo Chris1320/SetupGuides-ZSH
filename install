@@ -146,10 +146,6 @@ sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
     printf 'alias icat="kitten icat"               # use kitty icat module for displaying images in terminal\n'
     printf 'alias ls="eza --icons"                 # use eza in place to ls\n\n'
 
-    printf '# Oh-My-ZSH plugins config\n'
-    printf 'export ZSH_TMUX_AUTOSTART_ONCE=true\n'
-    printf 'export ZSH_TMUX_DEFAULT_SESSION_NAME=default\n'
-
     printf '# Edit ~/.config/zsh/user_env.sh to add custom environment variables.\n'
     printf 'export LANG=en_US.UTF-8                         # Set language environment variable.\n'
     printf 'export LESS="--no-init --quit-if-one-screen -R" # Causes `less` to just write to stdout if the text can be viewed without scrolling.\n'
