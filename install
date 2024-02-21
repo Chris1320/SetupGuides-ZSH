@@ -6,7 +6,7 @@
 # To disable changing the default shell and opening ZSH, run with `--install-only` flag.
 
 name="SetupGuides ZSH"
-version=(0 5 4)
+version=(0 6 0)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 
 ohmyzsh_install_script="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
@@ -36,13 +36,18 @@ omz_enabled_plugins=(
     "zsh-syntax-highlighting"
 )
 pkgs_to_install=(
+    "bat"
     "curl"
-    "fd-find"
+    "eza"
+    # "fd-find"
+    "fd"
     "fzf"
     "git"
     "ripgrep"
+    "tealdeer"
     "tmux"
     "wget"
+    "zoxide"
     "zsh"
 )
 
@@ -125,20 +130,36 @@ if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlig
 fi
 
 printf "[i] Editing \`.zshrc\`...\n\n"
+
+# Backup the old .zshrc configuration if it exists.
+if [[ -f "$HOME/.zshrc" ]]; then
+    cp "$HOME/.zshrc" "$HOME/.zshrc.$(date +"%Y-%m-%d_%H-%M-%S").bak"
+fi
+
 # Enable plugins and set theme.
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
 sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
 # shellcheck disable=SC2016
 {
-    printf '# Edit ~/.config/zsh/user_env.sh to add custom environment variables.\n\n'
+    printf 'alias cat="bat"                        # use bat in place to cat\n'
+    printf 'alias cd="z"                           # use zoxide in place to cd\n'
+    printf 'alias icat="kitten icat"               # use kitty icat module for displaying images in terminal\n'
+    printf 'alias ls="eza --icons"                 # use eza in place to ls\n\n'
 
+    printf '# Oh-My-ZSH plugins config\n'
+    printf 'export ZSH_TMUX_AUTOSTART_ONCE=true\n'
+    printf 'export ZSH_TMUX_DEFAULT_SESSION_NAME=default\n'
+
+    printf '# Edit ~/.config/zsh/user_env.sh to add custom environment variables.\n'
     printf 'export LANG=en_US.UTF-8                         # Set language environment variable.\n'
     printf 'export LESS="--no-init --quit-if-one-screen -R" # Causes `less` to just write to stdout if the text can be viewed without scrolling.\n'
     printf 'export GPG_TTY=$TTY                             # Fix GPG "gpg failed to sign data" error.\n'
     printf 'export PATH=$PATH:$HOME/.local/appimages        # Add AppImages to PATH.\n'
     printf 'export DOTNET_CLI_TELEMETRY_OPTOUT=true         # Disable .NET CLI telemetry.\n'
 
-    printf '\nsource ${HOME}/.config/zsh/user_env.sh            # Load user environment variables.\n'
+    printf '\n# Use zoxide if installed.\n'
+    printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init zsh)"; fi\n'
+    printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
 } >>"${HOME}/.zshrc"
 
 echo "[i] Creating directories..."
