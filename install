@@ -150,6 +150,7 @@ sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
     printf 'export LANG=en_US.UTF-8                         # Set language environment variable.\n'
     printf 'export LESS="--no-init --quit-if-one-screen -R" # Causes `less` to just write to stdout if the text can be viewed without scrolling.\n'
     printf 'export GPG_TTY=$TTY                             # Fix GPG "gpg failed to sign data" error.\n'
+    printf 'export PATH=$PATH:$HOME/.local/bin              # Add local bin to PATH.\n'
     printf 'export PATH=$PATH:$HOME/.local/appimages        # Add AppImages to PATH.\n'
     printf 'export DOTNET_CLI_TELEMETRY_OPTOUT=true         # Disable .NET CLI telemetry.\n'
 
