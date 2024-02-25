@@ -159,11 +159,17 @@ sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
 } >>"${HOME}/.zshrc"
 
 echo "[i] Creating directories..."
-mkdir -p "${HOME}/.config/zsh"
 mkdir -p "${HOME}/.local/appimages"
+mkdir -p "${HOME}/.local/bin"
+mkdir -p "${HOME}/.config/zsh"
 
 echo "[i] Creating files..."
 printf '#!/usr/bin/env bash\n\n# Write user configuration here' >"${HOME}/.config/zsh/user_env.sh"
+
+if ! command -v bat >/dev/null && command -v batcat >/dev/null; then
+    echo "[i] Creating bat symlink..."
+    ln -s "$(command -v batcat)" "${HOME}/.local/bin/bat"
+fi
 
 if [[ $1 = "--install-only" ]]; then
     printf "[i] Skipping changing default shell because of \`--install-only\` flag.\n\n"
