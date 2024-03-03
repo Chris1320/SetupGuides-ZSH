@@ -57,6 +57,7 @@ It will also install the following packages for productivity:
 
 The installation script has been tested on the following platforms:
 
+- Arch Linux
 - Kali Linux WSL
 - Linux Mint 21
 - Termux Android Terminal Emulator
@@ -74,9 +75,10 @@ To disable changing the default shell and opening ZSH, run with `--install-only`
 
 ### Manual Installation & Customization
 
-> [***NOTE***] Manual customization instructions are currently outdated.
-
-> [***NOTE***] This guide assumes that you are using `apt` as your package manager.
+> **_NOTES_**:
+>
+> - Manual customization instructions are currently outdated.
+> - This guide assumes that you are using `apt` as your package manager.
 
 1. Update apt and install zsh, wget, and git if not yet installed. `$ sudo apt update && sudo apt install --upgrade zsh wget git`
 2. Change the shell to zsh. `$ chsh -s $(which zsh)`[^1]
