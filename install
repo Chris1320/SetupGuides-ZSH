@@ -3,14 +3,14 @@
 # This installation script will install ZSH and customize it.
 # You can find this on https://github.com/SetupGuides/ZSH.
 #
-# To disable changing the default shell and opening ZSH, run with `--install-only` flag.
+# Run this script with no commands to see the usage.
 
 name="SetupGuides ZSH"
-version=(0 6 0)
+version=(0 7 0)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
+installer="$0"
 
 ohmyzsh_install_script="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
-
 powerlevel10k_git_src="https://github.com/romkatv/powerlevel10k.git"
 zsh_autosuggestions_git_src="https://github.com/zsh-users/zsh-autosuggestions.git"
 zsh_syntax_highlighting_git_src="https://github.com/zsh-users/zsh-syntax-highlighting.git"
@@ -20,164 +20,255 @@ powerlevel10k_install_dir="${ohmyzsh_install_dir}/custom/themes/powerlevel10k"
 zsh_autosuggestions_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-autosuggestions"
 zsh_syntax_highlighting_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-syntax-highlighting"
 
-omz_enabled_plugins=(
-    "command-not-found"
-    "fd"
-    "fzf"
-    "python"
-    "qrcode"
-    "ripgrep"
-    "sudo"
-    "tmux"
-    "wd"
-    "zsh-autosuggestions"
-    "zsh-interactive-cd"
-    "zsh-navigation-tools"
-    "zsh-syntax-highlighting"
-)
-pkgs_to_install=(
-    "bat"
-    "curl"
-    "eza"
-    # "fd-find"
-    "fd"
-    "fzf"
-    "git"
-    "ripgrep"
-    "tealdeer"
-    "tmux"
-    "wget"
-    "zoxide"
-    "zsh"
-)
+showHelp() {
+    printf "%s\n\n" "$title"
+    printf "Usage: %s <COMMAND> [OPTIONS]\n\n" "$installer"
+    echo "Commands:"
+    echo "    install    Install the customization files."
+    echo "    upgrade    Upgrade the customization files."
+    echo "    uninstall  Remove the customization files."
+}
 
-# Detect the user's package manager.
-if [[ -f "$(command -v pacman)" ]]; then
-    package_manager="pacman"
-elif [[ -f "$(command -v dnf)" ]]; then
-    package_manager="dnf"
-elif [[ -f "$(command -v apt)" ]]; then
-    package_manager="apt"
-else
-    echo "[E] Unable to automatically detect your package manager."
-    echo "[E] Please consider manually installing the customization instead."
-    echo "[E] Exiting..."
-    exit 127
-fi
-
-echo -e "[i] Detected package manager: ${package_manager}"
-echo "$title"
-echo
-
-# Check if the script is running as root.
-if [[ "$EUID" -eq 0 ]]; then
-    echo "This script must not be run as root."
-    echo "Run with \`./install\` instead."
-    exit 1
-fi
+# Detect the user's package manager using the `command -v` command.
+# If the package manager is not found, return nothing.
+detectUserPackageManager() {
+    package_managers=(
+        "pacman" # Arch (btw)
+        "dnf"    # Fedora
+        "apt"    # Debian/ubuntu
+    )
+    for pm in "${package_managers[@]}"; do
+        pm_path="$(command -v "$pm")"
+        if [[ -n "$pm_path" ]]; then
+            echo "$pm_path"
+            return
+        fi
+    done
+}
 
 # Check if the script is running on Termux.
 # $PREFIX is an envvar in Termux that contains the system filepath.
 # There is no need for sudo on Termux since we don't need root to install pkgs.
-if [[ $PREFIX = *"com.termux"* ]]; then
-    sudocmd=""
-else
-    sudocmd="sudo"
-fi
+detectTermuxEnvironment() {
+    if [[ $PREFIX == *"com.termux"* ]]; then
+        echo ""
+    else
+        echo "sudo"
+    fi
+}
 
-printf "[i] Installing needed packages...\n\n"
-if [[ "$package_manager" = "pacman" ]]; then
-    pkg_install_cmd="${sudocmd} pacman -Syu --noconfirm ${pkgs_to_install[*]}"
-elif [[ "$package_manager" = "dnf" ]]; then
-    # NOTE: chsh is not installed by default in Fedora and util-linux-user provides it.
-    pkg_install_cmd="${sudocmd} dnf install -y ${pkgs_to_install[*]} util-linux-user"
-elif [[ "$package_manager" = "apt" ]]; then
-    pkg_install_cmd="${sudocmd} apt update -y && ${sudocmd} apt install -y --upgrade ${pkgs_to_install[*]}"
-else
-    echo "[E] Unable to automatically detect your package manager."
-    echo "    Please consider manually installing the customization instead."
-    echo "    Exiting..."
-    exit 255
-fi
+# install the required packages for the ZSH customization.
+installRequiredPackages() {
+    pacman_pkgs=(
+        "bat"
+        "curl"
+        "eza"
+        "fd"
+        "fzf"
+        "git"
+        "ripgrep"
+        "tealdeer"
+        "tmux"
+        "wget"
+        "zoxide"
+        "zsh"
+    )
+    dnf_pkgs=(
+        "bat"
+        "curl"
+        "eza"
+        "fd-find"
+        "fzf"
+        "git"
+        "ripgrep"
+        "tealdeer"
+        "tmux"
+        "util-linux-user" # NOTE: chsh is not installed by default in Fedora and util-linux-user provides it.
+        "wget"
+        "zoxide"
+        "zsh"
+    )
+    apt_pkgs=(
+        "bat"
+        "curl"
+        "eza"
+        "fd-find"
+        "fzf"
+        "git"
+        "ripgrep"
+        "tealdeer"
+        "tmux"
+        "wget"
+        "zoxide"
+        "zsh"
+    )
+    package_manager="$(detectUserPackageManager)"
+    sudocmd="$(detectTermuxEnvironment)"
+    if [[ -z "$package_manager" ]]; then
+        echo "[E] Unable to automatically detect your package manager."
+        echo "    Please consider manually customizing instead."
+        echo "    Exiting..."
+        exit 127
+    fi
 
-if ! sh -c "$pkg_install_cmd"; then
-    echo "[E] Error installing dependencies."
-    exit 2
-fi
+    echo "Detected package manager: $package_manager"
+    if [[ -z "$sudocmd" ]]; then
+        echo "[i] Termux environment detected."
+    fi
 
-printf "[i] Installing Oh-My-ZSH...\n\n"
-if ! ZSH="$ohmyzsh_install_dir" sh -c "$(curl -L "$ohmyzsh_install_script")" "" --unattended; then
-    echo "[E] Failed to install Oh-My-ZSH."
-    exit 3
-fi
+    printf "Installing required packages...\n\n"
+    case "$package_manager" in
+    *pacman)
+        pkg_install_cmd="${sudocmd} ${package_manager} -Sy --noconfirm ${pacman_pkgs[*]}"
+        ;;
 
-printf "[i] Cloning Powerlevel10k theme...\n\n"
-if ! git clone --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir"; then
-    echo "[E] Failed to clone Powerlevel10k theme."
-    exit 4
-fi
+    *dnf)
+        pkg_install_cmd="${sudocmd} ${package_manager} install -y ${dnf_pkgs[*]}"
+        ;;
 
-printf "[i] Installing zsh-autosuggestions...\n\n"
-if ! git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}"; then
-    echo "[E] Failed to install zsh-autosuggestions."
-    exit 5
-fi
+    *apt)
+        pkg_install_cmd="${sudocmd} ${package_manager} update -y && ${sudocmd} ${package_manager} install -y --upgrade ${apt_pkgs[*]}"
+        ;;
 
-printf "[i] Installing zsh-syntax-highlighting...\n\n"
-if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir"; then
-    echo "[E] Failed to install zsh-syntax-highlighting."
-    exit 6
-fi
+    *)
+        echo "[E] Unable to automatically detect your package manager."
+        echo "    Please consider manually installing the customization instead."
+        echo "    Exiting..."
+        exit 255
+        ;;
+    esac
 
-printf "[i] Editing \`.zshrc\`...\n\n"
+    if ! bash -c "$pkg_install_cmd"; then
+        printf "\n[E] Error installing dependencies.\n"
+        exit 2
+    fi
+}
 
-# Backup the old .zshrc configuration if it exists.
-if [[ -f "$HOME/.zshrc" ]]; then
-    cp "$HOME/.zshrc" "$HOME/.zshrc.$(date +"%Y-%m-%d_%H-%M-%S").bak"
-fi
+installOhMyZsh() {
+    if ! ZSH="$ohmyzsh_install_dir" sh -c "$(curl -sSL "$ohmyzsh_install_script")" "" --unattended; then
+        echo "[E] Failed to install Oh-My-ZSH."
+        exit 3
+    fi
+}
 
-# Enable plugins and set theme.
-sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
-sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
-# shellcheck disable=SC2016
-{
-    printf 'alias cat="bat"                        # use bat in place to cat\n'
-    printf 'alias cd="z"                           # use zoxide in place to cd\n'
-    printf 'alias icat="kitten icat"               # use kitty icat module for displaying images in terminal\n'
-    printf 'alias ls="eza --icons"                 # use eza in place to ls\n\n'
+updateOhMyZsh() {
+    if ! cd "$ohmyzsh_install_dir" && git pull; then
+        echo "[E] Failed to update Oh-My-ZSH."
+        exit 65
+    fi
+    echo "[i] Oh-My-ZSH has been updated successfully."
+}
 
-    printf '# Edit ~/.config/zsh/user_env.sh to add custom environment variables.\n'
-    printf 'export LANG=en_US.UTF-8                         # Set language environment variable.\n'
-    printf 'export LESS="--no-init --quit-if-one-screen -R" # Causes `less` to just write to stdout if the text can be viewed without scrolling.\n'
-    printf 'export GPG_TTY=$TTY                             # Fix GPG "gpg failed to sign data" error.\n'
-    printf 'export PATH=$PATH:$HOME/.local/bin              # Add local bin to PATH.\n'
-    printf 'export PATH=$PATH:$HOME/.local/appimages        # Add AppImages to PATH.\n'
-    printf 'export DOTNET_CLI_TELEMETRY_OPTOUT=true         # Disable .NET CLI telemetry.\n'
+downloadZshPlugins() {
+    printf "[i] Installing Powerlevel10k theme...\n\n"
+    if ! git clone --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir"; then
+        echo "[E] Failed to clone Powerlevel10k theme."
+        exit 4
+    fi
 
-    printf '\n# Use zoxide if installed.\n'
-    printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init zsh)"; fi\n'
-    printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
-} >>"${HOME}/.zshrc"
+    printf "[i] Installing zsh-autosuggestions plugin...\n\n"
+    if ! git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}"; then
+        echo "[E] Failed to install zsh-autosuggestions."
+        exit 5
+    fi
 
-echo "[i] Creating directories..."
-mkdir -p "${HOME}/.local/appimages"
-mkdir -p "${HOME}/.local/bin"
-mkdir -p "${HOME}/.config/zsh"
+    printf "[i] Installing zsh-syntax-highlighting plugin...\n\n"
+    if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir"; then
+        echo "[E] Failed to install zsh-syntax-highlighting."
+        exit 6
+    fi
+}
 
-echo "[i] Creating files..."
-printf '#!/usr/bin/env bash\n\n# Write user configuration here' >"${HOME}/.config/zsh/user_env.sh"
+updateZshPlugins() {
+    if ! cd "$powerlevel10k_install_dir" && git pull; then
+        echo "[E] Failed to update Powerlevel10k theme."
+        exit 66
+    fi
+    if ! cd "$zsh_autosuggestions_install_dir" && git pull; then
+        echo "[E] Failed to update zsh-autosuggestions."
+        exit 67
+    fi
+    if ! cd "$zsh_syntax_highlighting_install_dir" && git pull; then
+        echo "[E] Failed to update zsh-syntax-highlighting."
+        exit 68
+    fi
+    echo "[i] ZSH plugins have been updated successfully."
+}
 
-if ! command -v bat >/dev/null && command -v batcat >/dev/null; then
-    echo "[i] Creating bat symlink..."
-    ln -s "$(command -v batcat)" "${HOME}/.local/bin/bat"
-fi
+populateDirectories() {
+    echo "[i] Creating directories..."
+    mkdir -p "${HOME}/.local/appimages"
+    mkdir -p "${HOME}/.local/bin"
+    mkdir -p "${HOME}/.config/zsh"
 
-if [[ $1 = "--install-only" ]]; then
-    printf "[i] Skipping changing default shell because of \`--install-only\` flag.\n\n"
+    if [[ ! -f "${HOME}/.config/zsh/user_env.sh" ]]; then
+        printf '#!/usr/bin/env bash\n\n# Write your custom configuration here' >"${HOME}/.config/zsh/user_env.sh"
+    fi
+}
 
-else
+editZshrc() {
+    omz_enabled_plugins=(
+        "command-not-found"
+        "fd"
+        "fzf" # adds CTRL+T and ALT+C keybindings
+        "gh"
+        "poetry"
+        "python"
+        "qrcode"
+        "ripgrep"
+        "ssh-agent" # NOTE: we might not use this
+        "sudo"
+        "tmux"
+        "urltools"
+        "wd"
+        "zsh-autosuggestions"
+        "zsh-interactive-cd"
+        "zsh-navigation-tools"
+        "zsh-syntax-highlighting"
+    )
+    printf "[i] Editing \`.zshrc\`...\n\n"
+
+    # Backup the old .zshrc configuration if it exists.
+    if [[ -f "$HOME/.zshrc" ]]; then
+        cp "$HOME/.zshrc" "$HOME/.config/zsh/.zshrc.$(date +"%Y-%m-%d_%H-%M-%S").bak"
+    fi
+
+    # Enable plugins and set theme.
+    sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
+    sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
+
+    # shellcheck disable=SC2016
+    {
+        printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place to cat\n'
+        printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place to cd\n'
+        printf 'if command -v kitty > /dev/null; then alias icat="kitten icat"; fi  # use icat module for displaying images in terminal (kitty terminal specific)\n'
+        printf 'if command -v eza > /dev/null; then alias ls="eza --icons"; fi      # use eza in place to ls\n\n'
+
+        printf '# Edit ~/.config/zsh/user_env.sh to add custom environment variables.\n'
+        printf 'export LANG=en_US.UTF-8                         # Set language environment variable.\n'
+        printf 'export LESS="--no-init --quit-if-one-screen -R" # Causes `less` to just write to stdout if the text can be viewed without scrolling.\n'
+        printf 'export GPG_TTY=$TTY                             # Fix GPG "gpg failed to sign data" error.\n'
+        printf 'export PATH=$PATH:$HOME/.local/bin              # Add local bin to PATH.\n'
+        printf 'export PATH=$PATH:$HOME/.local/appimages        # Add AppImages to PATH.\n'
+        printf 'export DOTNET_CLI_TELEMETRY_OPTOUT=true         # Disable .NET CLI telemetry.\n'
+
+        printf '\n# Use zoxide if installed.\n'
+        printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init zsh)"; fi\n'
+        printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
+    } >>"${HOME}/.zshrc"
+}
+
+# Fix `bat` not found on some systems because it is named `batcat`.
+fixBatcat() {
+    if ! command -v bat >/dev/null && command -v batcat >/dev/null; then
+        echo "[i] Creating bat symlink..."
+        ln -s "$(command -v batcat)" "${HOME}/.local/bin/bat"
+    fi
+}
+
+chshToZsh() {
     printf "[i] Changing default shell to zsh...\n\n"
-    if [[ $PREFIX = *"com.termux"* ]]; then
+    if [[ -z "$(detectTermuxEnvironment)" ]]; then
         if ! chsh -s zsh; then
             echo "[E] Failed to change default shell."
             exit 6
@@ -189,15 +280,86 @@ else
             exit 7
         fi
     fi
-fi
+}
 
-echo
-if [[ $1 = "--install-only" ]]; then
-    echo "[i] ${name} has been installed successfully."
-    echo "    Run \`$(command -v zsh)\` to try it out."
-    exit 0
+addWdWarpPoints() {
+    if [[ ! -f "${HOME}/.warprc" ]]; then
+        {
+            if [[ -d "${HOME}/Downloads" ]]; then
+                printf "dl:~/Downloads\n"
+            fi
 
-else
-    exec zsh -l && exit 0 # Run ZSH.
+            if [[ -d "${HOME}/temp" ]]; then
+                printf "t:~/temp\n"
+            fi
+        } >"${HOME}/.warprc"
+    fi
+}
 
-fi
+ensureNotRoot() {
+    # Check if the script is running as root.
+    if [[ "$EUID" -eq 0 ]]; then
+        echo "This script must not be run as root."
+        echo "Run with \`$installer\` instead."
+        exit 1
+    fi
+}
+
+commandInstall() {
+    ensureNotRoot
+    installRequiredPackages
+    installOhMyZsh
+    downloadZshPlugins
+    populateDirectories
+    editZshrc
+    fixBatcat
+    addWdWarpPoints
+
+    if [[ $2 = "--install-only" ]]; then
+        printf "[i] Skipping changing default shell because of \`--install-only\` flag.\n\n"
+        echo "[i] ${name} has been installed successfully."
+        echo "    Run \`$(command -v zsh)\` to try it out."
+        exit 0
+
+    else
+        chshToZsh
+        exec zsh -l && exit 0 # Run ZSH.
+    fi
+}
+
+commandUpgrade() {
+    ensureNotRoot
+    installRequiredPackages
+    updateOhMyZsh
+    updateZshPlugins
+}
+
+commandUninstall() {
+    # TODO: Implement this.
+    echo "Not yet implemented."
+}
+
+main() {
+    case "$1" in
+    install)
+        echo "Installing $title..."
+        commandInstall "$@"
+        ;;
+
+    upgrade)
+        echo "Upgrading $title..."
+        commandUpgrade "$@"
+        ;;
+
+    uninstall)
+        echo "Uninstalling $title..."
+        commandUninstall "$@"
+        ;;
+
+    *)
+        showHelp
+        ;;
+    esac
+}
+
+main "$@"
