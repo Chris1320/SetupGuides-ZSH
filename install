@@ -43,6 +43,7 @@ detectUserPackageManager() {
     if [[ -n "$(detectTermuxEnvironment)" ]]; then
         echo "[i] Termux environment detected."
         command -v "pkg"
+        return
     fi
 
     for pm in "${package_managers[@]}"; do
