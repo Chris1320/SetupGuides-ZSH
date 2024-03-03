@@ -58,7 +58,11 @@ detectUserPackageManager() {
 # $PREFIX is an envvar in Termux that contains the system filepath.
 # There is no need for sudo on Termux since we don't need root to install pkgs.
 detectTermuxEnvironment() {
-    [[ $PREFIX == *"com.termux"* ]]
+    if [[ $PREFIX == *"com.termux"* ]]; then
+        echo "true"
+    else
+        echo "false"
+    fi
 }
 
 # install the required packages for the ZSH customization.
