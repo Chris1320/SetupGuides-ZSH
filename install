@@ -12,11 +12,13 @@ installer="$0"
 
 ohmyzsh_install_script="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
 powerlevel10k_git_src="https://github.com/romkatv/powerlevel10k.git"
+you_should_use_git_src="https://github.com/MichaelAquilina/zsh-you-should-use.git"
 zsh_autosuggestions_git_src="https://github.com/zsh-users/zsh-autosuggestions.git"
 zsh_syntax_highlighting_git_src="https://github.com/zsh-users/zsh-syntax-highlighting.git"
 
 ohmyzsh_install_dir="$HOME/.oh-my-zsh"
 powerlevel10k_install_dir="${ohmyzsh_install_dir}/custom/themes/powerlevel10k"
+you_should_use_install_dir="${ohmyzsh_install_dir}/custom/plugins/you-should-use"
 zsh_autosuggestions_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-autosuggestions"
 zsh_syntax_highlighting_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-syntax-highlighting"
 
@@ -152,7 +154,7 @@ installOhMyZsh() {
 }
 
 updateOhMyZsh() {
-    if ! cd "$ohmyzsh_install_dir" && git pull; then
+    if ! omz update; then
         echo "[E] Failed to update Oh-My-ZSH."
         exit 65
     fi
@@ -166,16 +168,22 @@ downloadZshPlugins() {
         exit 4
     fi
 
+    printf "[i] Installing you-should-use plugin...\n\n"
+    if ! git clone --depth=1 "${you_should_use_git_src}" "${you_should_use_install_dir}"; then
+        echo "[E] Failed to clone you-should-use."
+        exit 5
+    fi
+
     printf "[i] Installing zsh-autosuggestions plugin...\n\n"
     if ! git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}"; then
         echo "[E] Failed to install zsh-autosuggestions."
-        exit 5
+        exit 6
     fi
 
     printf "[i] Installing zsh-syntax-highlighting plugin...\n\n"
     if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir"; then
         echo "[E] Failed to install zsh-syntax-highlighting."
-        exit 6
+        exit 7
     fi
 }
 
@@ -184,13 +192,18 @@ updateZshPlugins() {
         echo "[E] Failed to update Powerlevel10k theme."
         exit 66
     fi
+    if ! cd "$you_should_use_install_dir" && git pull; then
+        echo "[E] Failed to update you-should-use."
+        exit 67
+    fi
+
     if ! cd "$zsh_autosuggestions_install_dir" && git pull; then
         echo "[E] Failed to update zsh-autosuggestions."
-        exit 67
+        exit 68
     fi
     if ! cd "$zsh_syntax_highlighting_install_dir" && git pull; then
         echo "[E] Failed to update zsh-syntax-highlighting."
-        exit 68
+        exit 69
     fi
     echo "[i] ZSH plugins have been updated successfully."
 }
@@ -221,6 +234,7 @@ editZshrc() {
         "tmux"
         "urltools"
         "wd"
+        "you-should-use"
         "zsh-autosuggestions"
         "zsh-interactive-cd"
         "zsh-navigation-tools"
