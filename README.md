@@ -8,12 +8,30 @@
 
 This customization guide will do the following changes:
 
-- Install zsh, wget, and git packages.
-- Change your terminal shell to [zsh](https://www.zsh.org/).
+- Use **[ZSH](https://www.zsh.org/)** as your default terminal. (can be disabled by adding `--install-only` flag)
 - Install [oh-my-zsh](https://ohmyz.sh/), a zsh configuration manager.
 - Install [powerlevel10k](https://github.com/romkatv/powerlevel10k), a custom theme for zsh.
-- Install [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions), a plugin that will auto suggest commands based on your zsh history.
-- Install [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), a plugin that will provide syntax highlighting in your zsh shell.
+- Install/Enable the following plugins:
+
+| Plugin                                                                                        | Description                                                           |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [command-not-found](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/command-not-found) | Provide suggested packages to be installed if a command is not found. |
+| fd                                                                                            |                                                                       |
+| fzf                                                                                           |                                                                       |
+| gh                                                                                            |                                                                       |
+| poetry                                                                                        |                                                                       |
+| python                                                                                        |                                                                       |
+| qrcode                                                                                        |                                                                       |
+| ripgrep                                                                                       |                                                                       |
+| ssh-agent                                                                                     |                                                                       |
+| sudo                                                                                          |                                                                       |
+| tmux                                                                                          |                                                                       |
+| urltools                                                                                      |                                                                       |
+| wd                                                                                            |                                                                       |
+| [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)                       | A plugin that will auto suggest commands based on your zsh history.   |
+| zsh-interactive-cd                                                                            |                                                                       |
+| zsh-navigation-tools                                                                          |                                                                       |
+| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)               | A plugin that will provide syntax highlighting in your zsh shell.     |
 
 ## Installation
 
@@ -27,12 +45,12 @@ The installation script has been tested on the following platforms:
 
 Download and run the install script using either of the following commands:
 
-- Using *wget*: `$ bash <(wget -q -O - "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
-- Using *curl*: `$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install")`
+- Using _wget_: `$ bash <(wget -q -O - "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") install`
+- Using _curl_: `$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") install`
 
 To disable changing the default shell and opening ZSH, run with `--install-only` flag. Example:
 
-`$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") --install-only`
+`$ bash <(curl -sSf "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") install --install-only`
 
 ### Manual Installation & Customization
 
@@ -47,25 +65,25 @@ To disable changing the default shell and opening ZSH, run with `--install-only`
 7. Install zsh-syntax-highlighting. `$ git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH}/custom/plugins/zsh-syntax-highlighting`
 8. Find and edit the following lines in `~/.zshrc`:
 
-    | Option          | New Value                                                                            |
-    |-----------------|--------------------------------------------------------------------------------------|
-    | `ZSH_THEME`     | `powerlevel10k/powerlevel10k`                                                        |
-    | `plugins`       | `(command-not-found gh git python sudo zsh-autosuggestions zsh-syntax-highlighting)` |
+   | Option      | New Value                                                                            |
+   | ----------- | ------------------------------------------------------------------------------------ |
+   | `ZSH_THEME` | `powerlevel10k/powerlevel10k`                                                        |
+   | `plugins`   | `(command-not-found gh git python sudo zsh-autosuggestions zsh-syntax-highlighting)` |
 
 9. Edit `.zshrc` and add the following lines at the end of the file:[^2]
-    ```zsh
-    export LANG=en_US.UTF-8  # Set language environment variable.
-    export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.
-    export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.
-    ```
-10. (*Optional*) Install Powerlevel10k's [recommended font](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k).
+   ```zsh
+   export LANG=en_US.UTF-8  # Set language environment variable.
+   export LESS="--no-init --quit-if-one-screen -R"  # Causes `less` to just write to stdout if the text can be viewed without scrolling.
+   export GPG_TTY=$TTY  # Fix GPG "gpg failed to sign data" error.
+   ```
+10. (_Optional_) Install Powerlevel10k's [recommended font](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k).
 11. Reload the terminal. `$ source ~/.zshrc`
 12. Follow the on-screen instructions to set up Powerlevel10k.
 
 [^1]: If you encounter an error `chsh: <zsh-path>: non-standard shell`, add the path to `/etc/shells`. `$ echo "$(which zsh)" >> /etc/shells`. In Termux, you might have to use `$ chsh -s zsh` instead.
 [^2]: It is also recommended that you export the `EDITOR` and `VIEWER` environment variables.
 
------
+---
 
 **References**:
 
