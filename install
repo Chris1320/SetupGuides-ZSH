@@ -41,7 +41,6 @@ detectUserPackageManager() {
     )
 
     if [[ -n "$(detectTermuxEnvironment)" ]]; then
-        echo "[i] Termux environment detected."
         command -v "pkg"
         return
     fi
@@ -131,6 +130,9 @@ installRequiredPackages() {
         echo "    Please consider manually customizing instead."
         echo "    Exiting..."
         exit 127
+
+    elif [[ "$package_manager" == *"pkg" ]]; then
+        echo "[i] Termux environment detected."
     fi
 
     echo "Detected package manager: $package_manager"
