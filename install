@@ -39,6 +39,12 @@ detectUserPackageManager() {
         "dnf"    # Fedora
         "apt"    # Debian/ubuntu
     )
+
+    if [[ -n "$(detectTermuxEnvironment)" ]]; then
+        echo "[i] Termux environment detected."
+        command -v "pkg"
+    fi
+
     for pm in "${package_managers[@]}"; do
         pm_path="$(command -v "$pm")"
         if [[ -n "$pm_path" ]]; then
@@ -52,11 +58,7 @@ detectUserPackageManager() {
 # $PREFIX is an envvar in Termux that contains the system filepath.
 # There is no need for sudo on Termux since we don't need root to install pkgs.
 detectTermuxEnvironment() {
-    if [[ $PREFIX == *"com.termux"* ]]; then
-        echo ""
-    else
-        echo "sudo"
-    fi
+    [[ $PREFIX == *"com.termux"* ]]
 }
 
 # install the required packages for the ZSH customization.
@@ -104,8 +106,21 @@ installRequiredPackages() {
         "zoxide"
         "zsh"
     )
+    pkg_pkgs=(
+        "bat"
+        "curl"
+        "eza"
+        "fd"
+        "fzf"
+        "git"
+        "ripgrep"
+        "tealdeer"
+        "tmux"
+        "wget"
+        "zoxide"
+        "zsh"
+    )
     package_manager="$(detectUserPackageManager)"
-    sudocmd="$(detectTermuxEnvironment)"
     if [[ -z "$package_manager" ]]; then
         echo "[E] Unable to automatically detect your package manager."
         echo "    Please consider manually customizing instead."
@@ -114,22 +129,22 @@ installRequiredPackages() {
     fi
 
     echo "Detected package manager: $package_manager"
-    if [[ -z "$sudocmd" ]]; then
-        echo "[i] Termux environment detected."
-    fi
-
     printf "Installing required packages...\n\n"
     case "$package_manager" in
     *pacman)
-        pkg_install_cmd="${sudocmd} ${package_manager} -Sy --noconfirm ${pacman_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} -Sy --noconfirm ${pacman_pkgs[*]}"
         ;;
 
     *dnf)
-        pkg_install_cmd="${sudocmd} ${package_manager} install -y ${dnf_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} install -y ${dnf_pkgs[*]}"
         ;;
 
     *apt)
-        pkg_install_cmd="${sudocmd} ${package_manager} update -y && ${sudocmd} ${package_manager} install -y --upgrade ${apt_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} update -y && ${package_manager} install -y --upgrade ${apt_pkgs[*]}"
+        ;;
+
+    *pkg)
+        pkg_install_cmd="${package_manager} update -y && ${package_manager} install -y --upgrade ${pkg_pkgs[*]}"
         ;;
 
     *)
@@ -283,7 +298,7 @@ fixBatcat() {
 
 chshToZsh() {
     printf "[i] Changing default shell to zsh...\n\n"
-    if [[ -z "$(detectTermuxEnvironment)" ]]; then
+    if [[ -n "$(detectTermuxEnvironment)" ]]; then
         if ! chsh -s zsh; then
             echo "[E] Failed to change default shell."
             exit 6
