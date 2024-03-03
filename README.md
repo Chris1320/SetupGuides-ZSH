@@ -16,7 +16,8 @@ This customization guide will do the following changes:
 - Install [oh-my-zsh](https://ohmyz.sh/), a zsh framework.
 - Install [powerlevel10k](https://github.com/romkatv/powerlevel10k),
   a custom theme for zsh.
-- Install/Enable the following plugins:
+
+This customization guide will also help you install/enable the following plugins:
 
 | Plugin                                                                                              | Description                                                            |
 | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -37,6 +38,20 @@ This customization guide will do the following changes:
 | [zsh-interactive-cd](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/zsh-interactive-cd)     | Press `<TAB>` when cd'ing to launch fzf.                               |
 | [zsh-navigation-tools](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/zsh-navigation-tools) | Better navigation in zsh.                                              |
 | [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)                     | A plugin that will provide syntax highlighting in your zsh shell.      |
+
+It will also install the following packages for productivity:
+
+| Package                                          | Description                                                   |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| [bat](https://github.com/sharkdp/bat)            | A modern replacement for `cat`. (aliased to `cat` by default) |
+| [eza](https://github.com/eza-community/eza)      | A modern replacement for `ls`. (aliased to `ls` by default)   |
+| [fd](github.com/sharkdp/fd)                      | A file searcher.                                              |
+| [fzf](https://github.com/junegunn/fzf)           | A fuzzy finder.                                               |
+| [git](https://git-scm.com/)                      | A version control system.                                     |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | A text searcher.                                              |
+| [tealdeer](https://github.com/dbrgn/tealdeer)    | Simplified, example-based, and community-driven man pages.    |
+| [tmux](https://github.com/tmux/tmux/)            | A terminal multiplexer.                                       |
+| [zoxide](https://github.com/ajeetdsouza/zoxide)  | A smarter `cd` command. (aliased to `cd` by default)          |
 
 ## Installation
 
