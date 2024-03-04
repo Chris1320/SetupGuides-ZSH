@@ -40,7 +40,7 @@ detectUserPackageManager() {
         "apt"    # Debian/ubuntu
     )
 
-    if [[ -n "$(detectTermuxEnvironment)" ]]; then
+    if [[ "$(detectTermuxEnvironment)" == "true" ]]; then
         command -v "pkg"
         return
     fi
@@ -251,7 +251,7 @@ editZshrc() {
         "python"
         "qrcode"
         "ripgrep"
-        "ssh-agent" # NOTE: we might not use this
+        "ssh-agent"
         "sudo"
         "tmux"
         "urltools"
@@ -272,6 +272,11 @@ editZshrc() {
     # Enable plugins and set theme.
     sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
     sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
+
+    # shellcheck disable=SC2016
+    sed -i \
+        '/^source $ZSH\/oh-my-zsh.sh/i zstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes\n' \
+        "${HOME}/.zshrc"
 
     # shellcheck disable=SC2016
     {
@@ -305,7 +310,7 @@ fixBatcat() {
 
 chshToZsh() {
     printf "[i] Changing default shell to zsh...\n\n"
-    if [[ -n "$(detectTermuxEnvironment)" ]]; then
+    if [[ "$(detectTermuxEnvironment)" == "true" ]]; then
         if ! chsh -s zsh; then
             echo "[E] Failed to change default shell."
             exit 6
