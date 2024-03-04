@@ -6,7 +6,7 @@
 # Run this script with no commands to see the usage.
 
 name="SetupGuides ZSH"
-version=(0 7 0)
+version=(0 7 1)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 installer="$0"
 
@@ -135,23 +135,24 @@ installRequiredPackages() {
         echo "[i] Termux environment detected."
     fi
 
+    echo
     echo "Detected package manager: $package_manager"
     printf "Installing required packages...\n\n"
     case "$package_manager" in
     *pacman)
-        pkg_install_cmd="sudo ${package_manager} -Sy --noconfirm ${pacman_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} -Syq --noconfirm ${pacman_pkgs[*]}"
         ;;
 
     *dnf)
-        pkg_install_cmd="sudo ${package_manager} install -y ${dnf_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} install -qy ${dnf_pkgs[*]}"
         ;;
 
     *apt)
-        pkg_install_cmd="sudo ${package_manager} update -y && ${package_manager} install -y --upgrade ${apt_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} update -qy && ${package_manager} install -qy --upgrade ${apt_pkgs[*]}"
         ;;
 
     *pkg)
-        pkg_install_cmd="${package_manager} update -y && ${package_manager} install -y --upgrade ${pkg_pkgs[*]}"
+        pkg_install_cmd="${package_manager} update -qy && ${package_manager} install -qy --upgrade ${pkg_pkgs[*]}"
         ;;
 
     *)
@@ -184,46 +185,45 @@ updateOhMyZsh() {
 }
 
 downloadZshPlugins() {
-    printf "[i] Installing Powerlevel10k theme...\n\n"
-    if ! git clone --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir"; then
+    echo "[i] Installing Powerlevel10k theme..."
+    if ! git clone --quiet --depth=1 "${powerlevel10k_git_src}" "$powerlevel10k_install_dir"; then
         echo "[E] Failed to clone Powerlevel10k theme."
         exit 4
     fi
 
-    printf "[i] Installing you-should-use plugin...\n\n"
-    if ! git clone --depth=1 "${you_should_use_git_src}" "${you_should_use_install_dir}"; then
+    echo "[i] Installing you-should-use plugin..."
+    if ! git clone --quiet --depth=1 "${you_should_use_git_src}" "${you_should_use_install_dir}"; then
         echo "[E] Failed to clone you-should-use."
         exit 5
     fi
 
-    printf "[i] Installing zsh-autosuggestions plugin...\n\n"
-    if ! git clone --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}"; then
+    echo "[i] Installing zsh-autosuggestions plugin..."
+    if ! git clone --quiet --depth=1 "${zsh_autosuggestions_git_src}" "${zsh_autosuggestions_install_dir}"; then
         echo "[E] Failed to install zsh-autosuggestions."
         exit 6
     fi
 
-    printf "[i] Installing zsh-syntax-highlighting plugin...\n\n"
-    if ! git clone --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir"; then
+    echo "[i] Installing zsh-syntax-highlighting plugin..."
+    if ! git clone --quiet --depth=1 "$zsh_syntax_highlighting_git_src" "$zsh_syntax_highlighting_install_dir"; then
         echo "[E] Failed to install zsh-syntax-highlighting."
         exit 7
     fi
 }
 
 updateZshPlugins() {
-    if ! cd "$powerlevel10k_install_dir" && git pull; then
+    if ! cd "$powerlevel10k_install_dir" && git pull --quiet; then
         echo "[E] Failed to update Powerlevel10k theme."
         exit 66
     fi
-    if ! cd "$you_should_use_install_dir" && git pull; then
+    if ! cd "$you_should_use_install_dir" && git pull --quiet; then
         echo "[E] Failed to update you-should-use."
         exit 67
     fi
-
-    if ! cd "$zsh_autosuggestions_install_dir" && git pull; then
+    if ! cd "$zsh_autosuggestions_install_dir" && git pull --quiet; then
         echo "[E] Failed to update zsh-autosuggestions."
         exit 68
     fi
-    if ! cd "$zsh_syntax_highlighting_install_dir" && git pull; then
+    if ! cd "$zsh_syntax_highlighting_install_dir" && git pull --quiet; then
         echo "[E] Failed to update zsh-syntax-highlighting."
         exit 69
     fi
@@ -262,7 +262,7 @@ editZshrc() {
         "zsh-navigation-tools"
         "zsh-syntax-highlighting"
     )
-    printf "[i] Editing \`.zshrc\`...\n\n"
+    echo "[i] Editing \`.zshrc\`..."
 
     # Backup the old .zshrc configuration if it exists.
     if [[ -f "$HOME/.zshrc" ]]; then
@@ -273,6 +273,7 @@ editZshrc() {
     sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${HOME}/.zshrc"
     sed -i "s/^plugins=.*/plugins=(${omz_enabled_plugins[*]})/" "${HOME}/.zshrc"
 
+    # add plugin options
     # shellcheck disable=SC2016
     sed -i \
         '/^source $ZSH\/oh-my-zsh.sh/i zstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes\n' \
@@ -289,12 +290,12 @@ editZshrc() {
         printf 'export DOTNET_CLI_TELEMETRY_OPTOUT=true         # Disable .NET CLI telemetry.\n'
 
         printf '\n# Use zoxide if installed.\n'
-        printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init zsh)"; fi\n\n'
+        printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init --cmd cd zsh)"; fi\n\n'
 
-        printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place to cat\n'
-        printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place to cd\n'
+        printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place of cat\n'
+        # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
         printf 'if command -v kitty > /dev/null; then alias icat="kitten icat"; fi  # use icat module for displaying images in terminal (kitty terminal specific)\n'
-        printf 'if command -v eza > /dev/null; then alias ls="eza --icons"; fi      # use eza in place to ls\n\n'
+        printf 'if command -v eza > /dev/null; then alias ls="eza --icons"; fi      # use eza in place of ls\n\n'
 
         printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
     } >>"${HOME}/.zshrc"
@@ -309,7 +310,7 @@ fixBatcat() {
 }
 
 chshToZsh() {
-    printf "[i] Changing default shell to zsh...\n\n"
+    echo "[i] Changing default shell to zsh..."
     if [[ "$(detectTermuxEnvironment)" == "true" ]]; then
         if ! chsh -s zsh; then
             echo "[E] Failed to change default shell."
@@ -338,8 +339,8 @@ addWdWarpPoints() {
     fi
 }
 
+# Check if the script is running as root.
 ensureNotRoot() {
-    # Check if the script is running as root.
     if [[ "$EUID" -eq 0 ]]; then
         echo "This script must not be run as root."
         echo "Run with \`$installer\` instead."
@@ -358,7 +359,7 @@ commandInstall() {
     addWdWarpPoints
 
     if [[ $2 = "--install-only" ]]; then
-        printf "[i] Skipping changing default shell because of \`--install-only\` flag.\n\n"
+        echo "[i] Skipping changing default shell because of \`--install-only\` flag."
         echo "[i] ${name} has been installed successfully."
         echo "    Run \`$(command -v zsh)\` to try it out."
         exit 0
