@@ -148,7 +148,7 @@ installRequiredPackages() {
         ;;
 
     *apt)
-        pkg_install_cmd="sudo ${package_manager} update -qy && ${package_manager} install -qy --upgrade ${apt_pkgs[*]}"
+        pkg_install_cmd="sudo ${package_manager} update -qy && sudo ${package_manager} install -qy --upgrade ${apt_pkgs[*]}"
         ;;
 
     *pkg)
