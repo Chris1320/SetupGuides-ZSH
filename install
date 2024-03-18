@@ -177,7 +177,7 @@ installOhMyZsh() {
 }
 
 updateOhMyZsh() {
-    if ! omz update; then
+    if ! zsh "$ZSH/tools/upgrade.sh"; then
         echo "[E] Failed to update Oh-My-ZSH."
         exit 65
     fi
