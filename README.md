@@ -70,6 +70,10 @@ The installation script has been tested on the following platforms:
 
 ### Automatic Installation & Customization
 
+> **TIP**: It is recommended that you install a [nerd font](https://www.nerdfonts.com/)
+> before running the customization script. I personally use
+> **JetBrainsMono Nerd Font**, but you can use a different one.
+
 Download and run the install script using either of the following commands:
 
 - Using _wget_: `$ bash <(wget -q -O - "https://raw.githubusercontent.com/SetupGuides/ZSH/main/install") install`
