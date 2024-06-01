@@ -292,6 +292,7 @@ editZshrc() {
         printf '\n# Use zoxide if installed.\n'
         printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init --cmd cd zsh)"; fi\n\n'
 
+        printf 'if command -v git > /dev/null; then alias g="git"; fi               # an alias for the lazy\n'
         printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place of cat\n'
         # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
         printf 'if command -v kitty > /dev/null; then alias icat="kitten icat"; fi  # use icat module for displaying images in terminal (kitty terminal specific)\n'
