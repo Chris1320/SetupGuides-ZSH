@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 # This installation script will install ZSH and customize it.
-# You can find this on https://github.com/SetupGuides/ZSH.
+# You can find this on https://github.com/Chris1320/SetupGuides-ZSH.
 #
 # Run this script with no commands to see the usage.
 
 name="SetupGuides ZSH"
-version=(0 7 1)
+version=(0 8 0)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 installer="$0"
 
@@ -276,7 +276,7 @@ editZshrc() {
     # add plugin options
     # shellcheck disable=SC2016
     sed -i \
-        '/^source $ZSH\/oh-my-zsh.sh/i zstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes\n' \
+        '/^source $ZSH\/oh-my-zsh.sh/i zstyle :omz:plugins:ssh-agent quiet yes\nzstyle :omz:plugins:ssh-agent lazy yes\nexport PYTHON_AUTO_VRUN=true\n' \
         "${HOME}/.zshrc"
 
     # shellcheck disable=SC2016
@@ -292,10 +292,15 @@ editZshrc() {
         printf '\n# Use zoxide if installed.\n'
         printf 'if command -v zoxide > /dev/null; then eval "$(zoxide init --cmd cd zsh)"; fi\n\n'
 
+        printf '# enable kitten aliases for displaying images in terminal (kitty terminal specific)\n'
+        printf 'if command -v kitty > /dev/null; then\n'
+        printf '    alias icat="kitten icat"\n'
+        printf '    alias kssh="kitten ssh"\n'
+        printf 'fi\n\n'
+
         printf 'if command -v git > /dev/null; then alias g="git"; fi               # an alias for the lazy\n'
         printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place of cat\n'
         # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
-        printf 'if command -v kitty > /dev/null; then alias icat="kitten icat"; fi  # use icat module for displaying images in terminal (kitty terminal specific)\n'
         printf 'if command -v eza > /dev/null; then alias ls="eza --icons"; fi      # use eza in place of ls\n\n'
 
         printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
@@ -335,6 +340,11 @@ addWdWarpPoints() {
 
             if [[ -d "${HOME}/temp" ]]; then
                 printf "t:~/temp\n"
+            fi
+
+            # prefer ~/Temp over ~/temp
+            if [[ -d "${HOME}/Temp" ]]; then
+                printf "t:~/Temp\n"
             fi
         } >"${HOME}/.warprc"
     fi
