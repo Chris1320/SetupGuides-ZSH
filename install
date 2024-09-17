@@ -6,7 +6,7 @@
 # Run this script with no commands to see the usage.
 
 name="SetupGuides ZSH"
-version=(0 8 0)
+version=(0 8 1)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 installer="$0"
 
