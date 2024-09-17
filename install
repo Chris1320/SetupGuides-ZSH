@@ -244,13 +244,11 @@ populateDirectories() {
 editZshrc() {
     omz_enabled_plugins=(
         "command-not-found"
-        "fd"
         "fzf" # adds CTRL+T and ALT+C keybindings
         "gh"
         "poetry"
         "python"
         "qrcode"
-        "ripgrep"
         "ssh-agent"
         "sudo"
         "tmux"
