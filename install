@@ -22,6 +22,9 @@ you_should_use_install_dir="${ohmyzsh_install_dir}/custom/plugins/you-should-use
 zsh_autosuggestions_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-autosuggestions"
 zsh_syntax_highlighting_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-syntax-highlighting"
 
+tmux_tpm_git_src="https://github.com/tmux-plugins/tpm.git"
+tmux_tpm_install_dir="$HOME/.config/tmux/plugins/tpm"
+
 showHelp() {
     printf "%s\n\n" "$title"
     printf "Usage: %s <COMMAND> [OPTIONS]\n\n" "$installer"
@@ -210,6 +213,14 @@ downloadZshPlugins() {
     fi
 }
 
+downloadTmuxPlugins() {
+    echo "[i] Installing Tmux Plugin Manager..."
+    if ! git clone --quiet --depth=1 "$tmux_tpm_git_src" "$tmux_tpm_install_dir"; then
+        echo "[E] Failed to install Tmux Plugin Manager."
+        exit 8
+    fi
+}
+
 updateZshPlugins() {
     if ! cd "$powerlevel10k_install_dir" && git pull --quiet; then
         echo "[E] Failed to update Powerlevel10k theme."
@@ -369,6 +380,7 @@ commandInstall() {
     installRequiredPackages
     installOhMyZsh
     downloadZshPlugins
+    downloadTmuxPlugins
     populateDirectories
     editZshrc
     fixBatcat
