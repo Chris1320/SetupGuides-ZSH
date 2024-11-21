@@ -12,12 +12,14 @@ installer="$0"
 
 ohmyzsh_install_script="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
 powerlevel10k_git_src="https://github.com/romkatv/powerlevel10k.git"
+fastdirs_git_src="https://github.com/Chris1320/fastdirs-zsh.git"
 you_should_use_git_src="https://github.com/MichaelAquilina/zsh-you-should-use.git"
 zsh_autosuggestions_git_src="https://github.com/zsh-users/zsh-autosuggestions.git"
 zsh_syntax_highlighting_git_src="https://github.com/zsh-users/zsh-syntax-highlighting.git"
 
 ohmyzsh_install_dir="$HOME/.oh-my-zsh"
 powerlevel10k_install_dir="${ohmyzsh_install_dir}/custom/themes/powerlevel10k"
+fastdirs_install_dir="${ohmyzsh_install_dir}/custom/plugins/fastdirs"
 you_should_use_install_dir="${ohmyzsh_install_dir}/custom/plugins/you-should-use"
 zsh_autosuggestions_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-autosuggestions"
 zsh_syntax_highlighting_install_dir="${ohmyzsh_install_dir}/custom/plugins/zsh-syntax-highlighting"
@@ -194,6 +196,12 @@ downloadZshPlugins() {
         exit 4
     fi
 
+    echo "[i] Installing fastdirs plugin..."
+    if ! git clone --quiet --depth=1 "${fastdirs_git_src}" "${fastdirs_install_dir}"; then
+        echo "[E] Failed to clone fastdirs."
+        exit 55
+    fi
+
     echo "[i] Installing you-should-use plugin..."
     if ! git clone --quiet --depth=1 "${you_should_use_git_src}" "${you_should_use_install_dir}"; then
         echo "[E] Failed to clone you-should-use."
@@ -258,6 +266,7 @@ populateDirectories() {
 editZshrc() {
     omz_enabled_plugins=(
         "command-not-found"
+        "fastdirs"
         "fzf" # adds CTRL+T and ALT+C keybindings
         "gh"
         "poetry"
