@@ -6,7 +6,7 @@
 # Run this script with no commands to see the usage.
 
 name="SetupGuides ZSH"
-version=(0 9 1)
+version=(0 9 2)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 installer="$0"
 
@@ -324,6 +324,8 @@ editZshrc() {
         # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
         printf 'if command -v eza > /dev/null; then alias ls="eza"; fi              # use eza in place of ls\n\n'
 
+        printf '# Source NVM if installed\n'
+        printf '[[ -f "/usr/share/nvm/init-nvm.sh" ]] && source "/usr/share/nvm/init-nvm.sh"\n'
         printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
     } >>"${HOME}/.zshrc"
 }
