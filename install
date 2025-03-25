@@ -321,6 +321,7 @@ editZshrc() {
         printf 'fi\n\n'
 
         printf 'if command -v git > /dev/null; then alias g="git"; fi               # an alias for the lazy\n'
+        printf 'if command -v lazygit > /dev/null; then alias lg="lazygit"; fi      # an alias for the lazy... git.\n'
         printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place of cat\n'
         # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
         printf 'if command -v eza > /dev/null; then alias ls="eza"; fi              # use eza in place of ls\n\n'
