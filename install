@@ -89,7 +89,6 @@ installRequiredPackages() {
     dnf_pkgs=(
         "bat"
         "curl"
-        "eza"
         "fd-find"
         "fzf"
         "git"
@@ -150,6 +149,12 @@ installRequiredPackages() {
 
     *dnf)
         pkg_install_cmd="sudo ${package_manager} install -qy ${dnf_pkgs[*]}"
+        # Make sure eza is installed
+        if [[ -z "$(command -v eza)" ]]; then
+            echo "[!] Unable to find \`eza\` after installation. In Fedora systems, you need to manually install it."
+            echo "    See https://github.com/eza-community/eza/blob/main/INSTALL.md#fedora for instructions."
+            exit 3
+        fi
         ;;
 
     *apt)
