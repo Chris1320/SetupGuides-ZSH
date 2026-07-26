@@ -6,7 +6,7 @@
 # Run this script with no commands to see the usage.
 
 name="SetupGuides ZSH"
-version=(0 9 3)
+version=(0 9 4)
 title=$(printf "%s v%s.%s.%s" "$name" "${version[@]}")
 installer="$0"
 
@@ -150,12 +150,6 @@ installRequiredPackages() {
 
     *dnf)
         pkg_install_cmd="sudo ${package_manager} install -qy ${dnf_pkgs[*]}"
-        # Make sure eza is installed
-        if [[ -z "$(command -v eza)" ]]; then
-            echo "[!] Unable to find \`eza\` after installation. In Fedora systems, you need to manually install it."
-            echo "    See https://github.com/eza-community/eza/blob/main/INSTALL.md#fedora for instructions."
-            exit 3
-        fi
         ;;
 
     *apt)
