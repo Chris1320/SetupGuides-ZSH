@@ -325,10 +325,17 @@ editZshrc() {
         printf 'if command -v bat > /dev/null; then alias cat="bat"; fi             # use bat in place of cat\n'
         # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
         printf 'if command -v eza > /dev/null; then alias ls="eza"; fi              # use eza in place of ls\n\n'
+        printf 'if command -v xdg-open > /dev/null; then alias v="xdg-open"; fi     # open files with default application\n'
+        printf '[[ -f "${HOME}/.local/share/gradle/bin/gradle" ]] && export PATH="${PATH}:${HOME}/.local/share/gradle/bin"\n'
 
-        printf '# Source NVM if installed\n'
+        printf '# Add to PATH if installed.\n'
+        printf '[[ -d "$HOME/.spicetify" ]] && export PATH=$PATH:$HOME/.spicetify\n'
+
+        printf '# Source if installed\n'
         printf '[[ -f "/usr/share/nvm/init-nvm.sh" ]] && source "/usr/share/nvm/init-nvm.sh"\n'
-        printf 'source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
+        printf '[[ -f "${HOME}/.cargo/env" ]] && source "${HOME}/.cargo/env"\n'
+
+        printf '[[ -f "${HOME}/.config/zsh/user_env.sh" ]] && source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
     } >>"${HOME}/.zshrc"
 }
 
