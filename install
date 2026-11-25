@@ -322,7 +322,7 @@ editZshrc() {
         # printf 'if command -v zoxide > /dev/null; then alias cd="z"; fi             # use zoxide in place of cd\n'
         printf 'if command -v eza > /dev/null; then alias ls="eza"; fi              # use eza in place of ls\n\n'
         printf 'if command -v xdg-open > /dev/null; then alias v="xdg-open"; fi     # open files with default application\n'
-        printf '[[ -f "${HOME}/.local/share/gradle/bin/gradle" ]] && export PATH="${PATH}:${HOME}/.local/share/gradle/bin"\n'
+        # printf '[[ -f "${HOME}/.local/share/gradle/bin/gradle" ]] && export PATH="${PATH}:${HOME}/.local/share/gradle/bin"\n'
 
         printf '# Add to PATH if installed.\n'
         printf '[[ -d "$HOME/.spicetify" ]] && export PATH=$PATH:$HOME/.spicetify\n'
@@ -330,6 +330,8 @@ editZshrc() {
         printf '# Source if installed\n'
         printf '[[ -f "/usr/share/nvm/init-nvm.sh" ]] && source "/usr/share/nvm/init-nvm.sh"\n'
         printf '[[ -f "${HOME}/.cargo/env" ]] && source "${HOME}/.cargo/env"\n'
+        printf '[[ -d "$HOME/.sdkman" ]] && export SDKMAN_DIR="$HOME/.sdkman"\n'
+        printf '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"\n'
 
         printf '[[ -f "${HOME}/.config/zsh/user_env.sh" ]] && source "${HOME}/.config/zsh/user_env.sh"            # Load user environment variables.\n'
     } >>"${HOME}/.zshrc"
